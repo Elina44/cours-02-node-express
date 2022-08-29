@@ -32,7 +32,7 @@ const getMovieById = (req, res) => {
 };
 
 
-//Route pour le post avec retour des infos de la database :
+//Route pour le post (donc insérer des infos) avec retour des infos de la database :
 const postMovie = (req, res) => {
   const { title, director, year, color, duration } = req.body;
 
@@ -50,8 +50,32 @@ const postMovie = (req, res) => {
     });
 };
 
+//Pour modifier infos dans la base de données => PUT
+const updateMovie = (req, res) => {
+  const id = parseInt(req.params.id);
+  const { title, director, year, color, duration } = req.body;
+
+  database
+  .query(
+    "update movies set title = ?, director = ?, year = ?, color = ?, duration = ? where id = ?",
+    [title, director, year, color, duration, id]
+  )
+  .then(([result]) => {
+    if (result.affectedRow === 0) {
+      res.status(400).send("Not found");
+    } else {
+      res.sendStatus(204);
+    }
+  })
+  .catch((err) => {
+  console.error(err);
+  res.status(500).send("Error editing the movie");
+  });
+};
+
 module.exports = {
   getMovies,
   getMovieById,
   postMovie,
+  updateMovie
 };
